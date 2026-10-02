@@ -2,6 +2,8 @@
 
 import { useLayoutEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { films } from "@/data/portfolio";
 import { createTimeline, stagger } from "animejs";
 import { ActionLink, Container } from "./ui";
 
@@ -63,11 +65,12 @@ export function CinematicHero() {
       <div className="cinema-title-group">
         <p className="cinema-identity hero-support">Filmmaker × Developer × Vibecoder</p>
         <h1 id="hero-title" aria-label="I make films. I build things.">
-          <span className="title-line" aria-hidden="true">{["I", "MAKE", "FILMS."].map(word => <span className="word-mask" key={word}><span className="title-word">{word}</span></span>)}</span>
-          <span className="title-line title-line--second" aria-hidden="true">{["I", "BUILD", "THINGS."].map(word => <span className="word-mask" key={word}><span className="title-word">{word}</span></span>)}</span>
+          <span className="title-line" aria-hidden="true"><span className="title-prelude word-mask"><span className="title-word">I MAKE</span></span><span className="title-subject word-mask"><span className="title-word">FILMS.</span></span></span>
+          <span className="title-line title-line--second" aria-hidden="true"><span className="title-prelude word-mask"><span className="title-word">I BUILD</span></span><span className="title-subject word-mask"><span className="title-word">THINGS.</span></span></span>
         </h1>
       </div>
       <div className="cinema-bottom"><div className="cinema-intro hero-support"><p>Turning ideas into experiences.</p><span>Stories on screen. Ideas in code.</span></div><div className="hero-support"><ActionLink href="#work" variant="outline">Explore the work</ActionLink></div></div>
+      <nav className="cinema-reel hero-support" aria-label="Selected films">{films.map((film, index) => <Link href={`/films/${film.slug}`} key={film.slug} aria-label={`Explore ${film.title}`}><span className="reel-frame"><Image src={film.image} alt="" fill sizes="(max-width: 639px) 30vw, 200px" /></span><span className="reel-caption">0{index + 1} / {film.title}</span></Link>)}</nav>
       <div className="cinema-footer hero-support"><span>Film × Code × Experiments</span><a href="#work">Begin the next scene <span aria-hidden="true">↓</span></a></div>
     </Container>
   </section>;

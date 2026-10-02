@@ -22,6 +22,6 @@ export function MediaFrame({ src, alt, portrait = false, priority = false, sizes
   return <div className={`media-frame${portrait ? " media-frame--portrait" : ""}`}><Image src={src} alt={alt} fill priority={priority} sizes={sizes ?? "(max-width: 639px) calc(100vw - 40px), (max-width: 1023px) calc(100vw - 80px), (max-width: 1567px) calc(100vw - 128px), 1440px"} /></div>;
 }
 
-export function SectionHeading({ index, eyebrow, title, id, children }: { index: string; eyebrow: string; title: string; id: string; children?: ReactNode }) {
+export function SectionHeading({ index, eyebrow, title, id, children }: { index: string; eyebrow: string; title: ReactNode; id: string; children?: ReactNode }) {
   return <div className="section-heading"><div><p className="eyebrow"><span className="index">{index}</span>{eyebrow}</p><h2 id={id}>{title}</h2></div>{children && <div className="section-intro">{children}</div>}</div>;
 }

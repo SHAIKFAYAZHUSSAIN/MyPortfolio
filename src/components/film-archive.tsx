@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { animate, type JSAnimation } from "animejs";
 import type { Film } from "@/data/portfolio";
@@ -53,7 +54,9 @@ function FilmFrame({ film, index }: { film: Film; index: number }) {
   return <article className={`archive-film archive-film--${index + 1}`} aria-labelledby={`film-${film.slug}`}>
     <div className="archive-slate"><span>Film / 0{index + 1}</span><span>{film.year} <span aria-hidden="true">—</span> Short film</span></div>
     <a ref={frame} className="archive-screen" href={film.watchUrl} target="_blank" rel="noopener noreferrer" aria-label={`Watch ${film.title} on YouTube (opens in a new tab)`}>
-      <div ref={layer} className="archive-parallax"><div className="archive-scale"><MediaFrame src={film.image} alt={film.imageAlt} /></div></div>
+      <Image className="archive-atmosphere" src={film.image} alt="" fill sizes="(max-width: 639px) 100vw, 33vw" />
+      <div ref={layer} className="archive-parallax"><div className="archive-scale"><MediaFrame src={film.image} alt={film.imageAlt} sizes="(max-width: 639px) calc(100vw - 72px), 30vw" /></div></div>
+      <div className="archive-poster-type" aria-hidden="true"><span>A film by Fayaz Shaik</span><strong>{film.title}</strong><span>Written & directed / {film.year}</span></div>
       <span className="archive-play" aria-hidden="true">Play film <span>↗</span></span>
     </a>
     <div className="archive-caption"><div className="archive-title"><p className="metadata">{film.role}</p><h3 id={`film-${film.slug}`}><Link href={`/films/${film.slug}`}>{film.title}</Link></h3></div><div className="archive-actions"><Link className="action" href={`/films/${film.slug}`} aria-label={`Explore ${film.title}`}>Explore film <span aria-hidden="true">↗</span></Link><ActionLink href={film.watchUrl} external aria-label={`Watch ${film.title} on YouTube (opens in a new tab)`}>Watch</ActionLink></div></div>
@@ -62,5 +65,5 @@ function FilmFrame({ film, index }: { film: Film; index: number }) {
 }
 
 export function FilmArchive({ films }: { films: Film[] }) {
-  return <Section id="work" labelledBy="films-heading" className="archive-section"><SectionHeading index="01" eyebrow="The film archive" title="Three films. One voice." id="films-heading"><p>A collection of short films.<br />Written and directed by Fayaz Shaik.</p><a className="quiet-link" href="#code">Continue to code ↓</a></SectionHeading><div className="archive-collection">{films.map((film, index) => <FilmFrame film={film} index={index} key={film.slug} />)}</div><div className="archive-end"><span>End of collection / 03 films</span><a className="action" href="#code">Next: built in code <span aria-hidden="true">↓</span></a></div></Section>;
+  return <Section id="work" labelledBy="films-heading" className="archive-section"><SectionHeading index="01" eyebrow="The film archive / 2025" title="Films." id="films-heading"><p>Three films. One voice.<br />Written and directed by Fayaz Shaik.</p><a className="quiet-link" href="#code">Continue to code ↓</a></SectionHeading><div className="archive-collection">{films.map((film, index) => <FilmFrame film={film} index={index} key={film.slug} />)}</div><div className="archive-end"><span>End of collection / 03 films</span><a className="action" href="#code">Next: built in code <span aria-hidden="true">↓</span></a></div></Section>;
 }

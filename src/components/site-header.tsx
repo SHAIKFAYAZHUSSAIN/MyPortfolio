@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Container } from "./ui";
 
-const links = [{ href: "/#work", label: "Work" }, { href: "/#lab", label: "Lab" }, { href: "/#about", label: "About" }, { href: "/#contact", label: "Contact" }];
+const links = [{ href: "/#work", label: "Films" }, { href: "/#code", label: "Code" }, { href: "/#lab", label: "Lab" }, { href: "/#about", label: "About" }, { href: "/#contact", label: "Contact" }];
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
