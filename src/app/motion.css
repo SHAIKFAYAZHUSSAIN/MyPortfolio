@@ -24,7 +24,7 @@
 /* A sequence of shots, not a pinned carousel. All links stay in normal flow. */
 .archive-collection { grid-template-columns: minmax(0,1fr); gap: 0; }
 .archive-film { margin-bottom: 20px; }
-.shot-track { position: sticky; top: 76px; z-index: 6; background: #080c0bf5; display: flex; align-items: center; gap: 24px; padding: 13px 0; margin-bottom: 32px; border-block: 1px solid var(--rule); font: 9px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }
+.shot-track { position: sticky; top: 76px; z-index: 6; background: #090908f5; display: flex; align-items: center; gap: 24px; padding: 13px 0; margin-bottom: 32px; border-block: 1px solid var(--rule); font: 9px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }
 .shot-current { color: var(--accent); font-weight: 400; }
 .shot-name { min-width: 110px; color: var(--text); }
 .shot-progress { flex: 1; height: 1px; background: var(--rule); }
@@ -35,10 +35,10 @@
 .archive-parallax { top: 0; left: 0; width: 100%; }
 .archive-scale { border: 0; }
 .shot-drift { transform-origin: center; }
-.archive-scale img { filter: saturate(.55) brightness(.86); }
+.archive-scale img { filter: saturate(.62) brightness(.88); }
 .archive-atmosphere { filter: saturate(.3) brightness(.22); }
 .archive-poster-type { bottom: 30px; left: 36px; right: 36px; isolation: isolate; }
-.archive-poster-type::before { content: ''; position: absolute; z-index: -1; inset: -44px -36px -30px; background: linear-gradient(0deg,#080c0b 5%,#080c0bea 35%,transparent); }
+.archive-poster-type::before { content: ''; position: absolute; z-index: -1; inset: -44px -36px -30px; background: linear-gradient(0deg,#090908 5%,#090908ea 35%,transparent); }
 .archive-poster-type strong { font-size: clamp(40px,5.2vw,74px); max-width: 90%; margin-block: 8px 12px; }
 .archive-poster-type > span { font-size: 9px; }
 .archive-caption { display: flex; align-items: center; justify-content: space-between; gap: 32px; }

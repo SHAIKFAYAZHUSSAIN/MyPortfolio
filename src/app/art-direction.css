@@ -55,10 +55,10 @@ html { scroll-padding-top: 76px; }
 .navigation a:hover, .navigation a:focus-visible { border-color: var(--rule); color: var(--accent); text-decoration: none; }
 
 /* Opening frame: compact prelude, monumental serif, a real contact sheet. */
-.cinematic-hero { min-height: 760px; min-height: min(860px, max(760px, calc(100svh - 76px))); background: #080c0b; }
+.cinematic-hero { min-height: 760px; min-height: min(860px, max(760px, calc(100svh - 76px))); background: #090a08; }
 .cinema-image { inset: 0 -1% 0 34%; }
-.cinema-image img { object-position: 60% 28%; filter: saturate(.2) brightness(.65) contrast(1.07); }
-.cinema-shade { background: linear-gradient(90deg, #080c0b 2%, rgba(8,12,11,.95) 25%, rgba(8,12,11,.15) 66%), linear-gradient(0deg, #080c0b 0%, transparent 55%); }
+.cinema-image img { object-position: 60% 28%; filter: saturate(.5) brightness(.72) contrast(1.1); }
+.cinema-shade { background: linear-gradient(90deg, #090a08 2%, rgba(9,10,8,.95) 25%, rgba(9,10,8,.15) 66%), linear-gradient(0deg, #0b0907 0%, transparent 55%); }
 .cinema-content { padding-top: 26px; }
 .cinema-top .eyebrow, .cinema-edition { font-size: 9px; }
 .cinema-title-group { padding-top: 48px; padding-bottom: 26px; position: relative; z-index: 2; width: fit-content; }
@@ -79,13 +79,13 @@ html { scroll-padding-top: 76px; }
 .cinema-reel::after { bottom: 4px; }
 .cinema-reel a { flex: 1; min-width: 0; }
 .reel-frame { position: relative; display: block; aspect-ratio: 16/9; border: 1px solid #373e32; }
-.reel-frame img { object-fit: contain; filter: saturate(.35) brightness(.7); }
+.reel-frame img { object-fit: contain; filter: saturate(.45) brightness(.72); }
 .reel-caption { display: block; padding-top: 5px; font-size: 8px; text-transform: uppercase; color: #b7b6a4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cinema-reel a:hover img, .cinema-reel a:focus-visible img { filter: saturate(.75) brightness(.95); }
 
 /* Film sleeves retain the supplied landscape artwork in full, backed by a
    subdued atmospheric crop of that same image. No invented film stills. */
-.archive-section { border-top: 1px solid var(--rule); }
+.archive-section { border-top: 1px solid var(--rule); background: #090908; }
 .archive-section .section-heading { margin-bottom: 36px; }
 .archive-collection { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; }
 .archive-film, .archive-film--2, .archive-film--3 { width: 100%; justify-self: stretch; min-width: 0; }
@@ -97,7 +97,7 @@ html { scroll-padding-top: 76px; }
 .archive-parallax { position: absolute; top: 12%; left: 14px; width: calc(100% - 28px); }
 .archive-scale { border: 1px solid #99967855; }
 .archive-scale .media-frame { background: #020403; }
-.archive-scale img { filter: saturate(.5) brightness(.88); }
+.archive-scale img { filter: saturate(.62) brightness(.88); }
 .archive-poster-type { position: absolute; bottom: 30px; left: 24px; right: 24px; pointer-events: none; }
 .archive-poster-type > span { display: block; font-family: var(--font-mono); text-transform: uppercase; font-size: 8px; letter-spacing: .1em; color: #b1b5a9; }
 .archive-poster-type strong { display: block; font-family: var(--font-cinema); font-weight: 600; font-size: clamp(26px,3.2vw,46px); text-transform: uppercase; line-height: 1.05; letter-spacing: -.02em; word-spacing: .1em; margin-block: 12px 14px; }
@@ -113,14 +113,14 @@ html { scroll-padding-top: 76px; }
 .archive-end > span { font-size: 9px; }
 
 /* Compact technology cabinets; the final entry becomes an editorial spread. */
-.technology-section { background: #0a100d; }
+.technology-section { background: #090c10; }
 .technology-intro { font-size: 9px; }
 .technology-collection { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 28px; padding-top: 32px; }
 .tech-project, .tech-project--2 { display: flex; flex-direction: column; align-items: stretch; gap: 0; border: 1px solid var(--rule); background: #090d0b; }
 .tech-figure { order: -1; }
 .tech-visual { padding: 16px; background: #111713; border: 0; border-bottom: 1px solid var(--rule); }
-.tech-image { aspect-ratio: 16/9; box-shadow: none; }
-.tech-image img { filter: saturate(.22) brightness(.83); }
+.tech-image { aspect-ratio: 16/9; box-shadow: 0 2px 20px rgba(0,0,0,.35), 0 0 50px rgba(140,170,200,.025); }
+.tech-image img { filter: saturate(.4) brightness(.84); }
 .tech-figure figcaption { margin: 0; padding: 10px 22px; border-bottom: 1px solid var(--rule); font-size: 8px; }
 .tech-figure figcaption > span:last-child { display: none; }
 .tech-copy { padding: 24px; max-width: none; display: flex; flex-direction: column; flex: 1; }
@@ -138,7 +138,7 @@ html { scroll-padding-top: 76px; }
 .tech-project--3 .tech-figure { display: flex; flex-direction: column; border-right: 1px solid var(--rule); }
 .tech-project--3 .tech-visual { flex: 1; display: grid; align-items: center; }
 .tech-project--3 .tech-figure figcaption { border-bottom: 0; }
-.tech-project:hover .tech-image img, .tech-project:focus-within .tech-image img { filter: saturate(.85) brightness(1); }
+.tech-project:hover .tech-image img, .tech-project:focus-within .tech-image img { filter: saturate(.88) brightness(1); }
 .technology-footer { margin-top: 40px; padding-top: 18px; }
 .technology-footer p { font-size: 12px; }
 
@@ -166,11 +166,12 @@ html { scroll-padding-top: 76px; }
 .lab-colophon { border-color: var(--rule); margin-top: 40px; font-size: 10px; }
 .experiment-dialog h2 { font-family: var(--font-display); text-transform: none; letter-spacing: -.02em; }
 
+.about-section { background: #0a0908; }
 .about-layout { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 80px; }
 .about-copy, .portrait-column { min-width: 0; }
 .portrait-column { position: relative; }
 .portrait-column .media-frame { border: 1px solid var(--rule); }
-.portrait-column img { filter: saturate(.25) contrast(1.05); }
+.portrait-column img { filter: saturate(.42) contrast(1.06) brightness(.92); }
 .portrait-caption { font-size: 9px; text-transform: uppercase; }
 .about-copy h2 { font-family: var(--font-display); font-weight: 500; font-size: clamp(60px,6.6vw,94px); letter-spacing: .025em; line-height: .96; margin-block: 24px; }
 .about-manifesto { margin-bottom: 14px; color: var(--accent); font-size: 10px; }
@@ -179,9 +180,9 @@ html { scroll-padding-top: 76px; }
 .education { margin-block: 22px 8px; padding-block: 20px; }
 .education > p:not(.eyebrow) { font-size: 13px; }
 .education .metadata { font-size: 10px; }
-.contact-section { position: relative; isolation: isolate; overflow: hidden; background: #070b09; }
-.contact-section::before { content: ''; z-index: -2; position: absolute; inset: 0 0 0 45%; background: url('/images/fayaz.png') center 35% / cover; filter: grayscale(1) brightness(.3); opacity: .55; }
-.contact-section::after { content: ''; z-index: -1; position: absolute; inset: 0; background: linear-gradient(90deg,#070b09 25%,transparent 80%),linear-gradient(0deg,#070b09,transparent 80%); }
+.contact-section { position: relative; isolation: isolate; overflow: hidden; background: #090908; }
+.contact-section::before { content: ''; z-index: -2; position: absolute; inset: 0 0 0 45%; background: url('/images/fayaz.png') center 35% / cover; filter: grayscale(.65) brightness(.35); opacity: .45; }
+.contact-section::after { content: ''; z-index: -1; position: absolute; inset: 0; background: linear-gradient(90deg,#090908 25%,transparent 80%),linear-gradient(0deg,#090908,transparent 80%); }
 .contact-heading { margin-top: 26px; }
 .contact-heading h2 { font-size: clamp(52px,7.2vw,104px); line-height: 1.08; }
 .contact-heading h2 em { color: var(--text); }
@@ -201,7 +202,9 @@ html { scroll-padding-top: 76px; }
 .next-film > span:last-child { text-transform: uppercase; }
 @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
   .reel-frame img, .tech-image img, .archive-scale img { transition: filter 600ms ease; }
-  .archive-film:hover .archive-scale img { filter: saturate(.9) brightness(1); }
+  .tech-image { transition: transform 800ms cubic-bezier(.2,.65,.25,1), box-shadow 600ms ease; }
+  .archive-film:hover .archive-scale img { filter: saturate(.82) brightness(.97); }
+  .tech-project:hover .tech-image, .tech-project:focus-within .tech-image { box-shadow: 0 4px 24px rgba(0,0,0,.4), 0 0 60px rgba(140,170,200,.045); }
 }
 @media (hover: hover) and (pointer: fine) {
   .archive-screen { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23080c0b' fill-opacity='.9' stroke='%23e7e2d5' stroke-width='.7'/%3E%3Ctext x='32' y='35' text-anchor='middle' font-family='monospace' font-size='10' fill='%23e7e2d5'%3EWATCH%3C/text%3E%3C/svg%3E") 32 32, pointer; }
@@ -253,7 +256,7 @@ html { scroll-padding-top: 76px; }
   .cinema-top .eyebrow span { margin-inline: 10px; }
   .cinema-image { inset: 0 -28% 25% 5%; }
   .cinema-image img { object-position: 62% 15%; }
-  .cinema-shade { background: linear-gradient(90deg,rgba(8,12,11,.9),rgba(8,12,11,.22)),linear-gradient(0deg,#080c0b 22%,transparent 75%); }
+  .cinema-shade { background: linear-gradient(90deg,rgba(9,10,8,.9),rgba(9,10,8,.22)),linear-gradient(0deg,#0b0907 22%,transparent 75%); }
   .cinema-title-group { padding-top: 80px; padding-bottom: 26px; }
   .cinema-identity { font-size: 8px; letter-spacing: .01em; margin-bottom: 22px; }
   .cinematic-hero h1 { font-size: clamp(66px,17vw,100px); }
