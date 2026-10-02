@@ -1,41 +1,56 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { films } from "@/data/portfolio";
 import { createTimeline, stagger } from "animejs";
 import { ActionLink, Container } from "./ui";
+import { bindDrift, motion } from "@/lib/motion";
 
 export function CinematicHero() {
   const root = useRef<HTMLElement>(null);
 
+  useEffect(() => {
+    const hero = root.current;
+    const image = hero?.querySelector<HTMLElement>(".cinema-image");
+    if (hero && image) return bindDrift(hero, image, 18);
+  }, []);
+
   useLayoutEffect(() => {
     const hero = root.current;
     if (!hero) return;
-    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const preference = window.matchMedia(motion.query.reduce);
     // Deep links and restored scroll positions should never replay an introduction.
     if (preference.matches || window.scrollY > 40 || window.location.hash) return;
     const words = hero.querySelectorAll<HTMLElement>(".title-word");
-    const supporting = hero.querySelectorAll<HTMLElement>(".hero-support");
+    const metadata = hero.querySelectorAll<HTMLElement>(".cinema-top, .cinema-identity");
+    const supporting = hero.querySelectorAll<HTMLElement>(".cinema-bottom .hero-support, .cinema-footer");
     const image = hero.querySelector<HTMLElement>(".cinema-image");
+    const reel = hero.querySelector<HTMLElement>(".cinema-reel");
+    const grain = hero.querySelector<HTMLElement>(".hero-grain");
     const header = document.querySelector<HTMLElement>(".site-header");
-    const targets = [...words, ...supporting, ...(image ? [image] : []), ...(header ? [header] : [])];
+    const targets = [...words, ...metadata, ...supporting, ...[image, reel, grain, header].filter((element): element is HTMLElement => !!element)];
     const timeline = createTimeline({ autoplay: false });
     let finished = false;
     const finish = () => {
       if (finished) return;
       finished = true;
+      hero.removeAttribute("data-opening");
       timeline.revert();
       targets.forEach(element => { element.style.removeProperty("opacity"); element.style.removeProperty("transform"); });
     };
     try {
+      hero.dataset.opening = "true";
       targets.forEach(element => { element.style.opacity = "0"; });
-      timeline.add(words, { opacity: [0, 1], y: ["105%", "0%"], duration: 1300, delay: stagger(125), ease: "outQuart" }, 240);
-      if (image) timeline.add(image, { opacity: [0, 1], scale: [1.035, 1], duration: 3100, ease: "outSine" }, 650);
-      timeline.add(supporting, { opacity: [0, 1], y: [10, 0], duration: 1000, delay: stagger(120), ease: "outCubic" }, 1450);
-      if (header) timeline.add(header, { opacity: [0, 1], duration: 900, ease: "outSine" }, 2050);
-      timeline.call(finish, 3900);
+      if (grain) timeline.add(grain, { opacity: [0, .07], duration: 600, ease: motion.ease.calm }, 0);
+      timeline.add(metadata, { opacity: [0,1], duration: 650, delay: stagger(90), ease: motion.ease.calm }, 160);
+      timeline.add(words, { opacity: [0, 1], y: ["106%", "0%"], duration: motion.duration.reveal, delay: stagger(150), ease: motion.ease.reveal }, 380);
+      timeline.add(supporting, { opacity: [0, 1], y: [8, 0], duration: motion.duration.reveal, delay: stagger(100), ease: motion.ease.settle }, 1200);
+      if (image) timeline.add(image, { opacity: [0, 1], scale: [1.035, 1], duration: 1750, ease: motion.ease.calm }, 1400);
+      if (reel) timeline.add(reel, { opacity: [0,1], y: [12,0], duration: 1000, ease: motion.ease.settle }, 1870);
+      if (header) timeline.add(header, { opacity: [0, 1], duration: 650, ease: motion.ease.calm }, 2080);
+      timeline.call(finish, motion.duration.opening);
       timeline.play();
     } catch { finish(); }
     // Interaction immediately restores all controls; the introduction never blocks navigation.
@@ -46,7 +61,7 @@ export function CinematicHero() {
     window.addEventListener("pointerdown", finish, { once: true });
     window.addEventListener("scroll", onScroll, { passive: true });
     preference.addEventListener("change", onPreference);
-    const failSafe = window.setTimeout(finish, 4500);
+    const failSafe = window.setTimeout(finish, motion.duration.opening + 600);
     return () => {
       finish();
       window.clearTimeout(failSafe);
@@ -60,6 +75,7 @@ export function CinematicHero() {
   return <section ref={root} className="cinematic-hero" id="top" aria-labelledby="hero-title">
     <div className="cinema-image" aria-hidden="true"><Image src="/images/fayaz.png" alt="" fill priority sizes="(max-width: 639px) 100vw, 60vw" /></div>
     <div className="cinema-shade" aria-hidden="true" />
+    <div className="hero-grain" aria-hidden="true" />
     <Container className="cinema-content">
       <div className="cinema-top hero-support"><p className="eyebrow">Fayaz Shaik <span aria-hidden="true">/</span> Selected works</p><span className="cinema-edition">A personal collection — 01</span></div>
       <div className="cinema-title-group">

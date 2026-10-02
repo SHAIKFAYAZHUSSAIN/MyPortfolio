@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { ComponentProps, ReactNode } from "react";
+import { MotionText } from "./motion-text";
 
 export function Container({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <div className={`container ${className}`}>{children}</div>;
@@ -23,5 +24,5 @@ export function MediaFrame({ src, alt, portrait = false, priority = false, sizes
 }
 
 export function SectionHeading({ index, eyebrow, title, id, children }: { index: string; eyebrow: string; title: ReactNode; id: string; children?: ReactNode }) {
-  return <div className="section-heading"><div><p className="eyebrow"><span className="index">{index}</span>{eyebrow}</p><h2 id={id}>{title}</h2></div>{children && <div className="section-intro">{children}</div>}</div>;
+  return <div className="section-heading"><div><p className="eyebrow"><span className="index">{index}</span>{eyebrow}</p><h2 id={id}><MotionText>{title}</MotionText></h2></div>{children && <div className="section-intro">{children}</div>}</div>;
 }
