@@ -24,5 +24,5 @@ export function MediaFrame({ src, alt, portrait = false, priority = false, sizes
 }
 
 export function SectionHeading({ index, eyebrow, title, id, children }: { index: string; eyebrow: string; title: ReactNode; id: string; children?: ReactNode }) {
-  return <div className="section-heading"><div><p className="eyebrow"><span className="index">{index}</span>{eyebrow}</p><h2 id={id}><MotionText>{title}</MotionText></h2></div>{children && <div className="section-intro">{children}</div>}</div>;
+  return <div className="section-heading"><div><p className="eyebrow"><span className="index">{index}</span>{eyebrow}</p><h2 id={id}><MotionText>{title}</MotionText></h2><span className="section-rule" aria-hidden="true" /></div>{children && <div className="section-intro">{children}</div>}</div>;
 }

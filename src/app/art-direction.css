@@ -21,10 +21,19 @@
   --gutter: clamp(28px, 5vw, 80px);
 }
 body { background: var(--canvas); }
-/* One static, tiled grain texture; no animated noise or rendering loop. */
+@keyframes film-grain-ambient {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(-2px, 1.5px, 0); }
+  50% { transform: translate3d(1.5px, -1px, 0); }
+  75% { transform: translate3d(-1px, -1.5px, 0); }
+}
+/* Film grain: subtle, extremely slow CSS drift; no JS rendering loop. */
 body::after {
-  content: ''; position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: .035;
+  content: ''; position: fixed; inset: -10px; z-index: 40; pointer-events: none; opacity: .035;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23fff' filter='url(%23n)' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
+}
+@media (prefers-reduced-motion: no-preference) {
+  body::after { animation: film-grain-ambient 14s ease-in-out infinite; will-change: transform; }
 }
 h1, h2 { font-family: var(--font-cinema); font-weight: 600; font-optical-sizing: auto; text-transform: uppercase; letter-spacing: -.025em; word-spacing: .08em; line-height: 1.08; }
 h2 { font-size: clamp(44px, 5.5vw, 76px); }

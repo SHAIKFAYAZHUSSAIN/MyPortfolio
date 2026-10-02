@@ -13,51 +13,424 @@ export function MotionDirector() {
     const root = document.querySelector("main");
     if (!root) return;
     const preference = matchMedia(motion.query.reduce);
+    if (preference.matches) return;
+
+    const isDesktop = matchMedia("(min-width: 1024px)").matches;
+    const isMobile = !matchMedia("(min-width: 768px)").matches;
     const active = new Set<{ revert: () => unknown }>();
     const seen = new WeakSet<Element>();
-    const reveal = (element: HTMLElement) => {
+    const observers: IntersectionObserver[] = [];
+
+    const track = <T extends { revert: () => unknown }>(item: T): T => {
+      active.add(item);
+      return item;
+    };
+
+    // Generic fallback for any standalone motion-text not handled in a section sequence
+    const revealText = (element: HTMLElement) => {
       if (seen.has(element)) return;
       seen.add(element);
-      if (preference.matches || element.contains(document.activeElement)) return;
+      if (element.contains(document.activeElement)) return;
       const words = element.querySelectorAll<HTMLElement>(".motion-word");
+      if (!words.length) return;
       const duration = element.hasAttribute("data-motion-calm") ? motion.duration.calm : motion.duration.reveal;
-      const animation = animate(words, {
+      const anim = animate(words, {
         y: ["106%", "0%"], opacity: [.35, 1], duration,
-        delay: stagger(55), ease: motion.ease.reveal,
-        onComplete: () => { animation.revert(); active.delete(animation); },
+        delay: stagger(isMobile ? 35 : 55), ease: motion.ease.reveal,
+        onComplete: () => { anim.revert(); active.delete(anim); },
       });
-      active.add(animation);
+      track(anim);
     };
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => { if (entry.isIntersecting) { observer.unobserve(entry.target); reveal(entry.target as HTMLElement); } });
-    }, { threshold: .15, rootMargin: "0px 0px -8% 0px" });
-    root.querySelectorAll<HTMLElement>(".motion-text").forEach(element => observer.observe(element));
 
-    // Images and metadata have their own low-amplitude entrance; prose stays static.
-    const imageObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
+    // 1. CODE SECTION CHOREOGRAPHY
+    // Eyebrow -> Heading -> Section intro -> Project cards sequentially -> image slightly before copy -> settle
+    const codeSection = root.querySelector<HTMLElement>("#code");
+    if (codeSection) {
+      const codeHeading = codeSection.querySelector<HTMLElement>(".section-heading");
+      const codeEyebrow = codeHeading?.querySelector<HTMLElement>(".eyebrow");
+      const codeRule = codeHeading?.querySelector<HTMLElement>(".section-rule");
+      const codeTitle = codeHeading?.querySelector<HTMLElement>(".motion-text");
+      const codeWords = codeHeading?.querySelectorAll<HTMLElement>(".motion-word");
+      const codeIntro = codeHeading?.querySelector<HTMLElement>(".section-intro");
+      const techIntro = codeSection.querySelector<HTMLElement>(".technology-intro");
+      const collection = codeSection.querySelector<HTMLElement>(".technology-collection");
+      const cards = [...codeSection.querySelectorAll<HTMLElement>(".tech-project")];
+
+      if (codeTitle) seen.add(codeTitle);
+
+      if (codeHeading) {
+        const headObserver = new IntersectionObserver(([entry]) => {
+          if (!entry.isIntersecting) return;
+          headObserver.disconnect();
+          if (preference.matches || codeSection.contains(document.activeElement)) return;
+
+          const tl = createTimeline({ onComplete: () => { tl.revert(); active.delete(tl); } });
+          track(tl);
+
+          if (codeEyebrow) {
+            tl.add(codeEyebrow, { opacity: [0, 1], y: [isMobile ? 6 : 10, 0], duration: 600, ease: motion.ease.settle }, 0);
+          }
+          if (codeRule) {
+            tl.add(codeRule, { scaleX: [0, 1], duration: 750, ease: motion.ease.reveal }, 60);
+          }
+          if (codeWords && codeWords.length) {
+            tl.add(codeWords, { y: ["106%", "0%"], opacity: [.35, 1], duration: motion.duration.reveal, delay: stagger(isMobile ? 35 : 60), ease: motion.ease.reveal }, 120);
+          }
+          if (codeIntro) {
+            tl.add(codeIntro, { opacity: [0, 1], y: [isMobile ? 4 : 8, 0], duration: 600, ease: motion.ease.settle }, 240);
+          }
+          if (techIntro) {
+            tl.add(techIntro, { opacity: [0, 1], y: [isMobile ? 4 : 6, 0], duration: 550, ease: motion.ease.settle }, 320);
+          }
+        }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+        headObserver.observe(codeHeading);
+        observers.push(headObserver);
+      }
+
+      if (collection && cards.length) {
+        if (isDesktop) {
+          const cardsObserver = new IntersectionObserver(([entry]) => {
+            if (!entry.isIntersecting) return;
+            cardsObserver.disconnect();
+            if (preference.matches || collection.contains(document.activeElement)) return;
+
+            const tl = createTimeline({ onComplete: () => { tl.revert(); active.delete(tl); } });
+            track(tl);
+
+            cards.forEach((card, index) => {
+              const image = card.querySelector<HTMLElement>(".tech-image");
+              const copy = card.querySelectorAll<HTMLElement>(".tech-index, h3, .tech-description, .tech-metadata, .tech-links");
+              const start = index * 200;
+
+              if (image) {
+                tl.add(image, {
+                  clipPath: ["inset(8% 0 85% 0)", "inset(0% 0 0% 0)"],
+                  opacity: [.35, 1],
+                  y: [14, 0],
+                  duration: motion.duration.reveal,
+                  ease: motion.ease.reveal,
+                }, start);
+              }
+              if (copy.length) {
+                tl.add(copy, {
+                  opacity: [0, 1],
+                  y: [10, 0],
+                  duration: motion.duration.reveal,
+                  delay: stagger(35),
+                  ease: motion.ease.settle,
+                }, start + 130);
+              }
+            });
+          }, { threshold: 0.08, rootMargin: "0px 0px -4% 0px" });
+          cardsObserver.observe(collection);
+          observers.push(cardsObserver);
+        } else {
+          cards.forEach(card => {
+            const cardObserver = new IntersectionObserver(([entry]) => {
+              if (!entry.isIntersecting) return;
+              cardObserver.disconnect();
+              if (preference.matches || card.contains(document.activeElement)) return;
+
+              const image = card.querySelector<HTMLElement>(".tech-image");
+              const copy = card.querySelectorAll<HTMLElement>(".tech-index, h3, .tech-description, .tech-metadata, .tech-links");
+              const tl = createTimeline({ onComplete: () => { tl.revert(); active.delete(tl); } });
+              track(tl);
+
+              if (image) {
+                tl.add(image, {
+                  clipPath: ["inset(5% 0 70% 0)", "inset(0% 0 0% 0)"],
+                  opacity: [.4, 1],
+                  y: [8, 0],
+                  duration: 650,
+                  ease: motion.ease.reveal,
+                }, 0);
+              }
+              if (copy.length) {
+                tl.add(copy, {
+                  opacity: [0, 1],
+                  y: [6, 0],
+                  duration: 650,
+                  delay: stagger(25),
+                  ease: motion.ease.settle,
+                }, 90);
+              }
+            }, { threshold: 0.1, rootMargin: "0px 0px -4% 0px" });
+            cardObserver.observe(card);
+            observers.push(cardObserver);
+          });
+        }
+      }
+    }
+
+    // 2. LAB SECTION CHOREOGRAPHY
+    // Eyebrow -> Large heading -> Supporting copy -> Experiment interface (framing the experiment)
+    const labSection = root.querySelector<HTMLElement>("#lab");
+    if (labSection) {
+      const labHeading = labSection.querySelector<HTMLElement>(".playground-heading");
+      const labEyebrow = labHeading?.querySelector<HTMLElement>(".eyebrow");
+      const labStamp = labHeading?.querySelector<HTMLElement>(".lab-stamp");
+      const labRule = labHeading?.querySelector<HTMLElement>(".section-rule");
+      const labTitle = labHeading?.querySelector<HTMLElement>(".motion-text");
+      const labWords = labHeading?.querySelectorAll<HTMLElement>(".motion-word");
+      const labIntro = labHeading?.querySelector<HTMLElement>(".playground-intro");
+      const labShelf = labSection.querySelector<HTMLElement>(".lab-shelf");
+      const labCards = [...labSection.querySelectorAll<HTMLElement>(".experiment-card")];
+
+      if (labTitle) seen.add(labTitle);
+
+      if (labHeading) {
+        const headObserver = new IntersectionObserver(([entry]) => {
+          if (!entry.isIntersecting) return;
+          headObserver.disconnect();
+          if (preference.matches || labSection.contains(document.activeElement)) return;
+
+          const tl = createTimeline({ onComplete: () => { tl.revert(); active.delete(tl); } });
+          track(tl);
+
+          if (labEyebrow) {
+            tl.add(labEyebrow, { opacity: [0, 1], y: [isMobile ? 6 : 8, 0], duration: 600, ease: motion.ease.settle }, 0);
+          }
+          if (labStamp) {
+            tl.add(labStamp, { opacity: [0, 1], scale: [.94, 1], duration: 600, ease: motion.ease.settle }, 50);
+          }
+          if (labRule) {
+            tl.add(labRule, { scaleX: [0, 1], duration: 700, ease: motion.ease.reveal }, 80);
+          }
+          if (labWords && labWords.length) {
+            tl.add(labWords, { y: ["106%", "0%"], opacity: [.35, 1], duration: motion.duration.reveal, delay: stagger(isMobile ? 35 : 60), ease: motion.ease.reveal }, 140);
+          }
+          if (labIntro) {
+            const p = labIntro.querySelector("p");
+            const span = labIntro.querySelector("span");
+            if (p) tl.add(p, { opacity: [0, 1], y: [isMobile ? 6 : 10, 0], duration: 650, ease: motion.ease.settle }, 260);
+            if (span) tl.add(span, { opacity: [0, 1], y: [isMobile ? 4 : 8, 0], duration: 650, ease: motion.ease.settle }, 330);
+          }
+        }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+        headObserver.observe(labHeading);
+        observers.push(headObserver);
+      }
+
+      if (labShelf && labCards.length) {
+        if (isDesktop) {
+          const shelfObserver = new IntersectionObserver(([entry]) => {
+            if (!entry.isIntersecting) return;
+            shelfObserver.disconnect();
+            if (preference.matches || labShelf.contains(document.activeElement)) return;
+
+            const tl = createTimeline({ onComplete: () => { tl.revert(); active.delete(tl); } });
+            track(tl);
+
+            labCards.forEach((card, index) => {
+              const poster = card.querySelector<HTMLElement>(".lab-poster");
+              const text = card.querySelectorAll<HTMLElement>(".experiment-card-meta, h3, p, .experiment-open");
+              const start = index * 140;
+
+              tl.add(card, { opacity: [0, 1], y: [12, 0], duration: 680, ease: motion.ease.settle }, start);
+              if (poster) {
+                tl.add(poster, { clipPath: ["inset(4% 0 4% 0)", "inset(0% 0 0% 0)"], opacity: [.4, 1], duration: 680, ease: motion.ease.reveal }, start);
+              }
+              if (text.length) {
+                tl.add(text, { opacity: [0, 1], y: [6, 0], duration: 550, delay: stagger(30), ease: motion.ease.settle }, start + 90);
+              }
+            });
+          }, { threshold: 0.1, rootMargin: "0px 0px -4% 0px" });
+          shelfObserver.observe(labShelf);
+          observers.push(shelfObserver);
+        } else {
+          labCards.forEach(card => {
+            const cardObserver = new IntersectionObserver(([entry]) => {
+              if (!entry.isIntersecting) return;
+              cardObserver.disconnect();
+              if (preference.matches || card.contains(document.activeElement)) return;
+
+              const poster = card.querySelector<HTMLElement>(".lab-poster");
+              const text = card.querySelectorAll<HTMLElement>(".experiment-card-meta, h3, p, .experiment-open");
+              const tl = createTimeline({ onComplete: () => { tl.revert(); active.delete(tl); } });
+              track(tl);
+
+              tl.add(card, { opacity: [0, 1], y: [8, 0], duration: 600, ease: motion.ease.settle }, 0);
+              if (poster) tl.add(poster, { opacity: [.5, 1], duration: 550, ease: motion.ease.reveal }, 0);
+              if (text.length) tl.add(text, { opacity: [0, 1], y: [4, 0], duration: 550, delay: stagger(20), ease: motion.ease.settle }, 70);
+            }, { threshold: 0.1, rootMargin: "0px 0px -4% 0px" });
+            cardObserver.observe(card);
+            observers.push(cardObserver);
+          });
+        }
+      }
+    }
+
+    // 3. ABOUT SECTION CHOREOGRAPHY
+    // Calm reveal: 1. Heading begins low-opacity/offset -> 2. Heading resolves -> 3. Portrait reveals -> 4. Biography appears -> 5. Details appear last
+    const aboutSection = root.querySelector<HTMLElement>("#about");
+    if (aboutSection) {
+      const aboutEyebrow = aboutSection.querySelector<HTMLElement>(".about-copy .eyebrow");
+      const aboutRule = aboutSection.querySelector<HTMLElement>(".section-rule");
+      const aboutTitle = aboutSection.querySelector<HTMLElement>(".about-copy .motion-text");
+      const aboutWords = aboutSection.querySelectorAll<HTMLElement>("#about-heading .motion-word");
+      const portrait = aboutSection.querySelector<HTMLElement>(".portrait-column .media-frame");
+      const caption = aboutSection.querySelector<HTMLElement>(".portrait-caption");
+      const manifesto = aboutSection.querySelector<HTMLElement>(".about-manifesto");
+      const lead = aboutSection.querySelector<HTMLElement>(".about-lead");
+      const muted = aboutSection.querySelector<HTMLElement>(".about-copy > .muted");
+      const education = aboutSection.querySelector<HTMLElement>(".education");
+      const connect = aboutSection.querySelector<HTMLElement>(".about-copy > .action");
+
+      if (aboutTitle) seen.add(aboutTitle);
+
+      const aboutObserver = new IntersectionObserver(([entry]) => {
         if (!entry.isIntersecting) return;
-        imageObserver.unobserve(entry.target);
-        if (preference.matches || entry.target.contains(document.activeElement)) return;
-        const image = entry.target.querySelector(".tech-image");
-        const metadata = entry.target.querySelector(".tech-index");
-        const timeline = createTimeline({ onComplete: () => { timeline.revert(); active.delete(timeline); } });
-        if (image) timeline.add(image, { clipPath: ["inset(8% 0 90% 0)", "inset(0% 0 0% 0)"], opacity: [.4,1], duration: motion.duration.reveal, ease: motion.ease.reveal }, 0);
-        if (metadata) timeline.add(metadata, { y: [8,0], opacity: [.3,1], duration: motion.duration.reveal, ease: motion.ease.settle }, 180);
-        active.add(timeline);
+        aboutObserver.disconnect();
+        if (preference.matches || aboutSection.contains(document.activeElement)) return;
+
+        const tl = createTimeline({ onComplete: () => { tl.revert(); active.delete(tl); } });
+        track(tl);
+
+        // 1 & 2. Eyebrow arrives softly; Heading begins low-opacity & offset, resolves calmly
+        if (aboutEyebrow) {
+          tl.add(aboutEyebrow, { opacity: [0, 1], y: [isMobile ? 4 : 6, 0], duration: 650, ease: motion.ease.calm }, 0);
+        }
+        if (aboutRule) {
+          tl.add(aboutRule, { scaleX: [0, 1], duration: 800, ease: motion.ease.calm }, 60);
+        }
+        if (aboutWords && aboutWords.length) {
+          tl.add(aboutWords, {
+            opacity: [.18, 1],
+            y: ["55%", "0%"],
+            duration: motion.duration.calm,
+            delay: stagger(isMobile ? 45 : 85),
+            ease: motion.ease.calm,
+          }, 100);
+        }
+        // 3. Portrait reveals with photographic calm (not overanimated)
+        if (portrait) {
+          tl.add(portrait, {
+            opacity: [.25, 1],
+            scale: [1.02, 1],
+            duration: motion.duration.calm,
+            ease: motion.ease.calm,
+          }, isMobile ? 50 : 440);
+        }
+        if (caption) {
+          tl.add(caption, { opacity: [0, 1], duration: 650, ease: motion.ease.calm }, isMobile ? 250 : 640);
+        }
+        // 4. Biography appears
+        const bioElements = [manifesto, lead, muted].filter((el): el is HTMLElement => !!el);
+        if (bioElements.length) {
+          tl.add(bioElements, {
+            opacity: [0, 1],
+            y: [isMobile ? 4 : 8, 0],
+            duration: 800,
+            delay: stagger(isMobile ? 40 : 90),
+            ease: motion.ease.calm,
+          }, isMobile ? 320 : 680);
+        }
+        // 5. Supporting details appear last
+        const detailElements = [education, connect].filter((el): el is HTMLElement => !!el);
+        if (detailElements.length) {
+          tl.add(detailElements, {
+            opacity: [0, 1],
+            y: [isMobile ? 4 : 6, 0],
+            duration: 750,
+            delay: stagger(isMobile ? 35 : 80),
+            ease: motion.ease.calm,
+          }, isMobile ? 500 : 980);
+        }
+      }, { threshold: 0.1, rootMargin: "0px 0px -6% 0px" });
+      aboutObserver.observe(aboutSection);
+      observers.push(aboutObserver);
+    }
+
+    // 4. CONTACT SECTION CHOREOGRAPHY
+    // Final scene: 1. Background atmosphere -> 2. Large heading -> 3. Supporting copy -> 4. Contact link/arrow
+    const contactSection = root.querySelector<HTMLElement>("#contact");
+    if (contactSection) {
+      const contactEyebrow = contactSection.querySelector<HTMLElement>(".contact-section > .eyebrow");
+      const contactRule = contactSection.querySelector<HTMLElement>(".section-rule");
+      const contactTitle = contactSection.querySelector<HTMLElement>(".contact-heading .motion-text");
+      const contactWords = contactSection.querySelectorAll<HTMLElement>("#contact-heading .motion-word");
+      const arrow = contactSection.querySelector<HTMLElement>(".contact-arrow");
+      const email = contactSection.querySelector<HTMLElement>(".email-link");
+      const bottom = contactSection.querySelector<HTMLElement>(".contact-bottom p");
+      const socials = contactSection.querySelectorAll<HTMLElement>(".social-links .action");
+
+      if (contactTitle) seen.add(contactTitle);
+
+      const contactObserver = new IntersectionObserver(([entry]) => {
+        if (!entry.isIntersecting) return;
+        contactObserver.disconnect();
+        if (preference.matches || contactSection.contains(document.activeElement)) return;
+
+        const tl = createTimeline({ onComplete: () => { tl.revert(); active.delete(tl); } });
+        track(tl);
+
+        // 1. Atmosphere & eyebrow
+        if (contactEyebrow) {
+          tl.add(contactEyebrow, { opacity: [0, 1], y: [isMobile ? 4 : 8, 0], duration: 600, ease: motion.ease.settle }, 0);
+        }
+        if (contactRule) {
+          tl.add(contactRule, { scaleX: [0, 1], duration: 750, ease: motion.ease.settle }, 60);
+        }
+        // 2. Large heading
+        if (contactWords && contactWords.length) {
+          tl.add(contactWords, {
+            y: ["106%", "0%"],
+            opacity: [.25, 1],
+            duration: 900,
+            delay: stagger(isMobile ? 45 : 85),
+            ease: motion.ease.reveal,
+          }, 140);
+        }
+        // 3. Supporting copy
+        if (email) {
+          tl.add(email, { opacity: [0, 1], y: [isMobile ? 6 : 10, 0], duration: 750, ease: motion.ease.settle }, 440);
+        }
+        if (bottom) {
+          tl.add(bottom, { opacity: [0, 1], y: [isMobile ? 4 : 8, 0], duration: 700, ease: motion.ease.settle }, 520);
+        }
+        // 4. Contact link/arrow: final frame of a film (NO bounce, NO giant scale, NO pulse)
+        if (arrow) {
+          tl.add(arrow, { opacity: [0, 1], y: [isMobile ? 4 : 6, 0], duration: 800, ease: motion.ease.calm }, 640);
+        }
+        if (socials.length) {
+          tl.add(socials, { opacity: [0, 1], y: [isMobile ? 2 : 4, 0], duration: 600, delay: stagger(isMobile ? 25 : 45), ease: motion.ease.settle }, 700);
+        }
+      }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+      contactObserver.observe(contactSection);
+      observers.push(contactObserver);
+    }
+
+    // Generic observer for any other .motion-text (e.g. standalone text)
+    const textObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          textObserver.unobserve(entry.target);
+          revealText(entry.target as HTMLElement);
+        }
       });
-    }, { threshold: .12 });
-    root.querySelectorAll(".tech-project").forEach(element => imageObserver.observe(element));
+    }, { threshold: .15, rootMargin: "0px 0px -8% 0px" });
+    root.querySelectorAll<HTMLElement>(".motion-text").forEach(element => {
+      if (!seen.has(element)) textObserver.observe(element);
+    });
+    observers.push(textObserver);
+
     const drifts: (() => void)[] = [];
     root.querySelectorAll<HTMLElement>(".experiment-launch").forEach(surface => {
       const layer = surface.querySelector<HTMLElement>(".lab-poster > div, .lab-poster svg, .lab-poster > img");
       if (layer) drifts.push(bindDrift(surface, layer, 5));
     });
+
     const settle = () => { active.forEach(animation => animation.revert()); active.clear(); };
     const onPreference = () => { if (preference.matches) settle(); };
     root.addEventListener("focusin", settle);
     preference.addEventListener("change", onPreference);
-    return () => { observer.disconnect(); imageObserver.disconnect(); settle(); drifts.forEach(cleanup => cleanup()); root.removeEventListener("focusin", settle); preference.removeEventListener("change", onPreference); };
+
+    return () => {
+      observers.forEach(obs => obs.disconnect());
+      settle();
+      drifts.forEach(cleanup => cleanup());
+      root.removeEventListener("focusin", settle);
+      preference.removeEventListener("change", onPreference);
+    };
   }, [pathname]);
 
   useEffect(() => {
