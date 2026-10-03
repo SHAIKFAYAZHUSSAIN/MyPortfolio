@@ -49,6 +49,8 @@ export function OpeningSplash() {
     if (!root) return;
 
     let finished = false;
+    let exitAnimation: ReturnType<typeof animate> | undefined;
+    const preference = window.matchMedia(motion.query.reduce);
     let revealDispatched = false;
 
     const dispatchReveal = () => {
@@ -66,8 +68,14 @@ export function OpeningSplash() {
       finished = true;
       dispatchReveal();
 
+      tl.pause();
+      root.style.pointerEvents = "none";
+      if (preference.matches) {
+        setMounted(false);
+        return;
+      }
       // Cinematic exit cut: camera push & dissolve
-      animate(root, {
+      exitAnimation = animate(root, {
         opacity: [1, 0],
         scale: [1, 1.025],
         duration: 440,
@@ -97,12 +105,8 @@ export function OpeningSplash() {
     root.addEventListener("pointerdown", onPointer, { once: true });
     window.addEventListener("scroll", onScroll, { passive: true });
 
-    // Track asset/page loading
-    let isPageLoaded = document.readyState === "complete";
-    const onLoad = () => {
-      isPageLoaded = true;
-    };
-    if (!isPageLoaded) window.addEventListener("load", onLoad, { once: true });
+    const onPreference = () => { if (preference.matches) finish(); };
+    preference.addEventListener("change", onPreference);
 
     // Query elements
     const wordEls = root.querySelectorAll<HTMLElement>(".splash-word[data-index]");
@@ -128,7 +132,7 @@ export function OpeningSplash() {
       tl.call(() => {
         if (counterEl) counterEl.textContent = String(index + 1).padStart(2, "0");
         if (progressEl) progressEl.style.width = `${((index + 1) / (WORDS.length + 1)) * 100}%`;
-        if (timecodeEl) timecodeEl.textContent = `00:00:0${index + 1}:12`;
+        if (timecodeEl) timecodeEl.textContent = `00:00:${String(index + 1).padStart(2, "0")}:12`;
       }, currentTime);
 
       if (el) {
@@ -183,12 +187,16 @@ export function OpeningSplash() {
     tl.play();
 
     return () => {
-      finish();
+      finished = true;
+      tl.revert();
+      exitAnimation?.revert();
+      finishRef.current = null;
+      root.style.removeProperty("pointer-events");
+      preference.removeEventListener("change", onPreference);
       window.clearTimeout(failsafe);
       window.removeEventListener("keydown", onKey);
       root.removeEventListener("pointerdown", onPointer);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("load", onLoad);
     };
   }, [mounted]);
 

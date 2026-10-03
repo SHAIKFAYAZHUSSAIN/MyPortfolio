@@ -33,6 +33,13 @@ export function CinematicHero() {
     const targets = [...words, ...metadata, ...supporting, ...[image, reel, grain, header].filter((element): element is HTMLElement => !!element)];
     const timeline = createTimeline({ autoplay: false });
     let finished = false;
+    let startTimer: number | undefined;
+    let started = false;
+    const startHero = () => {
+      if (started || finished) return;
+      started = true;
+      timeline.play();
+    };
     const finish = () => {
       if (finished) return;
       finished = true;
@@ -55,16 +62,10 @@ export function CinematicHero() {
       const isSplashPending = document.documentElement.classList.contains("splash-pending") ||
         !!document.querySelector(".opening-splash[data-active='true']");
 
-      let started = false;
-      const startHero = () => {
-        if (started || finished) return;
-        started = true;
-        timeline.play();
-      };
 
       if (isSplashPending) {
         window.addEventListener("splash:reveal", startHero, { once: true });
-        window.setTimeout(startHero, 4200);
+        startTimer = window.setTimeout(startHero, 4200);
       } else {
         startHero();
       }
@@ -81,6 +82,8 @@ export function CinematicHero() {
     return () => {
       finish();
       window.clearTimeout(failSafe);
+      window.clearTimeout(startTimer);
+      window.removeEventListener("splash:reveal", startHero);
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("pointerdown", finish);
       window.removeEventListener("scroll", onScroll);
@@ -93,7 +96,7 @@ export function CinematicHero() {
     <div className="cinema-shade" aria-hidden="true" />
     <div className="hero-grain" aria-hidden="true" />
     <Container className="cinema-content">
-      <div className="cinema-top hero-support"><p className="eyebrow">Fayaz Shaik <span aria-hidden="true">/</span> Selected works</p><span className="cinema-edition">A personal collection — 01</span></div>
+      <div className="cinema-top hero-support"><p className="eyebrow">Fayaz Shaik <span aria-hidden="true">/</span> Selected works</p><span className="cinema-edition">Independent films / Digital experiences</span></div>
       <div className="cinema-title-group">
         <p className="cinema-identity hero-support">Filmmaker × Developer × Vibecoder</p>
         <h1 id="hero-title" aria-label="I make films. I build things.">

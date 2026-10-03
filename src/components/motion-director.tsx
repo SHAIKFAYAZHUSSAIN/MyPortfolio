@@ -162,104 +162,7 @@ export function MotionDirector() {
       }
     }
 
-    // 2. LAB SECTION CHOREOGRAPHY
-    // Eyebrow -> Large heading -> Supporting copy -> Experiment interface (framing the experiment)
-    const labSection = root.querySelector<HTMLElement>("#lab");
-    if (labSection) {
-      const labHeading = labSection.querySelector<HTMLElement>(".playground-heading");
-      const labEyebrow = labHeading?.querySelector<HTMLElement>(".eyebrow");
-      const labStamp = labHeading?.querySelector<HTMLElement>(".lab-stamp");
-      const labRule = labHeading?.querySelector<HTMLElement>(".section-rule");
-      const labTitle = labHeading?.querySelector<HTMLElement>(".motion-text");
-      const labWords = labHeading?.querySelectorAll<HTMLElement>(".motion-word");
-      const labIntro = labHeading?.querySelector<HTMLElement>(".playground-intro");
-      const labShelf = labSection.querySelector<HTMLElement>(".lab-shelf");
-      const labCards = [...labSection.querySelectorAll<HTMLElement>(".experiment-card")];
-
-      if (labTitle) seen.add(labTitle);
-
-      if (labHeading) {
-        const headObserver = new IntersectionObserver(([entry]) => {
-          if (!entry.isIntersecting) return;
-          headObserver.disconnect();
-          if (preference.matches || labSection.contains(document.activeElement)) return;
-
-          const tl = createTimeline({ onComplete: () => { tl.revert(); active.delete(tl); } });
-          track(tl);
-
-          if (labEyebrow) {
-            tl.add(labEyebrow, { opacity: [0, 1], y: [isMobile ? 6 : 8, 0], duration: 600, ease: motion.ease.settle }, 0);
-          }
-          if (labStamp) {
-            tl.add(labStamp, { opacity: [0, 1], scale: [.94, 1], duration: 600, ease: motion.ease.settle }, 50);
-          }
-          if (labRule) {
-            tl.add(labRule, { scaleX: [0, 1], duration: 700, ease: motion.ease.reveal }, 80);
-          }
-          if (labWords && labWords.length) {
-            tl.add(labWords, { y: ["106%", "0%"], opacity: [.35, 1], duration: motion.duration.reveal, delay: stagger(isMobile ? 35 : 60), ease: motion.ease.reveal }, 140);
-          }
-          if (labIntro) {
-            const p = labIntro.querySelector("p");
-            const span = labIntro.querySelector("span");
-            if (p) tl.add(p, { opacity: [0, 1], y: [isMobile ? 6 : 10, 0], duration: 650, ease: motion.ease.settle }, 260);
-            if (span) tl.add(span, { opacity: [0, 1], y: [isMobile ? 4 : 8, 0], duration: 650, ease: motion.ease.settle }, 330);
-          }
-        }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
-        headObserver.observe(labHeading);
-        observers.push(headObserver);
-      }
-
-      if (labShelf && labCards.length) {
-        if (isDesktop) {
-          const shelfObserver = new IntersectionObserver(([entry]) => {
-            if (!entry.isIntersecting) return;
-            shelfObserver.disconnect();
-            if (preference.matches || labShelf.contains(document.activeElement)) return;
-
-            const tl = createTimeline({ onComplete: () => { tl.revert(); active.delete(tl); } });
-            track(tl);
-
-            labCards.forEach((card, index) => {
-              const poster = card.querySelector<HTMLElement>(".lab-poster");
-              const text = card.querySelectorAll<HTMLElement>(".experiment-card-meta, h3, p, .experiment-open");
-              const start = index * 140;
-
-              tl.add(card, { opacity: [0, 1], y: [12, 0], duration: 680, ease: motion.ease.settle }, start);
-              if (poster) {
-                tl.add(poster, { clipPath: ["inset(4% 0 4% 0)", "inset(0% 0 0% 0)"], opacity: [.4, 1], duration: 680, ease: motion.ease.reveal }, start);
-              }
-              if (text.length) {
-                tl.add(text, { opacity: [0, 1], y: [6, 0], duration: 550, delay: stagger(30), ease: motion.ease.settle }, start + 90);
-              }
-            });
-          }, { threshold: 0.1, rootMargin: "0px 0px -4% 0px" });
-          shelfObserver.observe(labShelf);
-          observers.push(shelfObserver);
-        } else {
-          labCards.forEach(card => {
-            const cardObserver = new IntersectionObserver(([entry]) => {
-              if (!entry.isIntersecting) return;
-              cardObserver.disconnect();
-              if (preference.matches || card.contains(document.activeElement)) return;
-
-              const poster = card.querySelector<HTMLElement>(".lab-poster");
-              const text = card.querySelectorAll<HTMLElement>(".experiment-card-meta, h3, p, .experiment-open");
-              const tl = createTimeline({ onComplete: () => { tl.revert(); active.delete(tl); } });
-              track(tl);
-
-              tl.add(card, { opacity: [0, 1], y: [8, 0], duration: 600, ease: motion.ease.settle }, 0);
-              if (poster) tl.add(poster, { opacity: [.5, 1], duration: 550, ease: motion.ease.reveal }, 0);
-              if (text.length) tl.add(text, { opacity: [0, 1], y: [4, 0], duration: 550, delay: stagger(20), ease: motion.ease.settle }, 70);
-            }, { threshold: 0.1, rootMargin: "0px 0px -4% 0px" });
-            cardObserver.observe(card);
-            observers.push(cardObserver);
-          });
-        }
-      }
-    }
-
-    // 3. ABOUT SECTION CHOREOGRAPHY
+    // 2. ABOUT SECTION CHOREOGRAPHY
     // Calm reveal: 1. Heading begins low-opacity/offset -> 2. Heading resolves -> 3. Portrait reveals -> 4. Biography appears -> 5. Details appear last
     const aboutSection = root.querySelector<HTMLElement>("#about");
     if (aboutSection) {
@@ -413,12 +316,6 @@ export function MotionDirector() {
     });
     observers.push(textObserver);
 
-    const drifts: (() => void)[] = [];
-    root.querySelectorAll<HTMLElement>(".experiment-launch").forEach(surface => {
-      const layer = surface.querySelector<HTMLElement>(".lab-poster > div, .lab-poster svg, .lab-poster > img");
-      if (layer) drifts.push(bindDrift(surface, layer, 5));
-    });
-
     const settle = () => { active.forEach(animation => animation.revert()); active.clear(); };
     const onPreference = () => { if (preference.matches) settle(); };
     root.addEventListener("focusin", settle);
@@ -427,7 +324,6 @@ export function MotionDirector() {
     return () => {
       observers.forEach(obs => obs.disconnect());
       settle();
-      drifts.forEach(cleanup => cleanup());
       root.removeEventListener("focusin", settle);
       preference.removeEventListener("change", onPreference);
     };

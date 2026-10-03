@@ -26,17 +26,6 @@ export interface CodeProject {
   visualCaption: string;
 }
 
-export interface Experiment {
-  slug: string;
-  title: string;
-  category: "Film" | "Interfaces" | "Creative coding" | "AI experiments";
-  description: string;
-  status: "Exploring" | "Prototype" | "Released";
-  publishedAt: string;
-  url?: string;
-  engine: "type-study" | "interference" | "signal-slice";
-}
-
 export const profile = {
   name: "Fayaz Shaik",
   tagline: "Turning ideas into experiences",
@@ -60,10 +49,4 @@ export const projects: CodeProject[] = [
   { slug: "guidex", title: "GuideX", category: "Travel / Concept demo", description: "A travel guide that turns destination, budget and trip length into an itinerary concept. Built to make planning feel more approachable.", url: "https://guidex-lyart.vercel.app/", repositoryUrl: "https://github.com/SHAIKFAYAZHUSSAIN/guidex", technologies: ["React", "Next.js", "TypeScript", "Tailwind CSS"], image: "/images/projects/guidex.webp", imageAlt: "GuideX live interface with the headline Travel Different Not Harder and yellow editorial typography", visualCaption: "GuideX / Travel planning concept" },
   { slug: "cityflow", title: "CityFlow", category: "Urban networks", description: "Hyderabad Urban Corridor Network. An interface for exploring corridor traffic, commuter navigation and infrastructure planning.", url: "https://cityflow-dqv8.onrender.com/", technologies: ["HTML", "CSS", "JavaScript"], technologyScope: "Front end", image: "/images/projects/cityflow.webp", imageAlt: "CityFlow executive mission control interface showing the Hyderabad Urban Corridor Network and operational portals", visualCaption: "CityFlow / Mission control interface" },
   { slug: "maanaksetu", title: "MaanakSetu", category: "SIH / Standards intelligence", description: "Analyzes tender requirements and maps them to applicable Indian Standards, allied references, certifications and regulatory requirements.", url: "https://maanaksetu.vercel.app/", repositoryUrl: "https://github.com/SHAIKFAYAZHUSSAIN/MaanakSetu", technologies: ["React", "Next.js", "TypeScript", "Tailwind CSS"], image: "/images/projects/maanaksetu.webp", imageAlt: "MaanakSetu public demo workspace for turning procurement requirements into standards-ready specifications", visualCaption: "MaanakSetu / Public demo workspace" },
-];
-
-export const experiments: Experiment[] = [
-  { slug: "type-study", engine: "type-study", title: "Type, untamed.", category: "Interfaces", description: "A phrase becomes a form. Bend the baseline, open the spacing, and make it your own.", status: "Prototype", publishedAt: "2026-10-02" },
-  { slug: "interference", engine: "interference", title: "Between the lines.", category: "Creative coding", description: "A field of lines shaped by overlapping waves. Change the density, find a pattern, let it move.", status: "Prototype", publishedAt: "2026-10-02" },
-  { slug: "signal-slice", engine: "signal-slice", title: "Signal / self.", category: "Creative coding", description: "A portrait pulled into horizontal fragments. Explore the point where an image becomes a signal.", status: "Prototype", publishedAt: "2026-10-02" },
 ];

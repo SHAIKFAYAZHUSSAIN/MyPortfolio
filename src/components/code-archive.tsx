@@ -8,7 +8,7 @@ import { ActionLink, Section, SectionHeading } from "./ui";
 
 export function CodeArchive({ projects, githubUrl }: { projects: CodeProject[]; githubUrl: string }) {
   return <Section id="code" labelledBy="code-heading" className="technology-section">
-    <SectionHeading index="02" eyebrow="Creative technology archive" title={<>Things <em>I build.</em></>} id="code-heading"><p>Ideas, made tangible.<br />Interfaces to explore. Systems to make sense of things.</p><a href="#lab" className="quiet-link">Continue to the lab ↓</a></SectionHeading>
+    <SectionHeading index="02" eyebrow="Creative technology archive" title={<>Things <em>I build.</em></>} id="code-heading"><p>Ideas, made tangible.<br />Interfaces to explore. Systems to make sense of things.</p><a href="#about" className="quiet-link">Continue to about ↓</a></SectionHeading>
     <div className="technology-intro"><span>Selected development / 03 projects</span><span>From concept to interface</span></div>
     <div className="technology-collection">{projects.map((project, index) => <article className={`tech-project tech-project--${index + 1}`} key={project.slug} aria-labelledby={`code-${project.slug}`}>
       <div className="tech-copy"><div className="tech-index"><span>0{index + 1}</span><span>{project.category}</span></div><h3 id={`code-${project.slug}`}><MotionText>{project.title}</MotionText></h3><p className="tech-description">{project.description}</p>

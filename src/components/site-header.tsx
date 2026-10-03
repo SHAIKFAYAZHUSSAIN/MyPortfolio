@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Container } from "./ui";
+import { MultilingualWordmark } from "./multilingual-wordmark";
 
-const links = [{ href: "/#work", label: "Films" }, { href: "/#code", label: "Code" }, { href: "/#lab", label: "Lab" }, { href: "/#about", label: "About" }, { href: "/#contact", label: "Contact" }];
+const links = [{ href: "/#work", label: "Films" }, { href: "/#code", label: "Code" }, { href: "/#about", label: "About" }, { href: "/#contact", label: "Contact" }];
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -31,7 +32,7 @@ export function SiteHeader() {
     query.addEventListener("change", close);
     return () => { document.removeEventListener("keydown", escape); query.removeEventListener("change", close); };
   }, [open]);
-  return <header className="site-header"><Container className="header-inner"><a className="wordmark" href="/#top" onClick={() => setOpen(false)} aria-label="Fayaz Shaik, back to top">Fayaz Shaik<span aria-hidden="true">.</span></a><span className="header-note">Independent perspective</span><button ref={toggle} className="menu-toggle" aria-expanded={open} aria-controls="primary-nav" onClick={() => setOpen(!open)}>{open ? "Close −" : "Menu +"}</button><nav id="primary-nav" aria-label="Primary navigation" className={open ? "navigation is-open" : "navigation"}>{links.map(link => <a key={link.href} href={link.href} aria-current={active === link.href.slice(2) ? "location" : undefined} onClick={() => setOpen(false)}>{link.label}<span aria-hidden="true">↗</span></a>)}</nav></Container></header>;
+  return <header className="site-header"><Container className="header-inner"><MultilingualWordmark onClick={() => setOpen(false)} /><span className="header-note">Independent perspective</span><button ref={toggle} className="menu-toggle" aria-expanded={open} aria-controls="primary-nav" onClick={() => setOpen(!open)}>{open ? "Close −" : "Menu +"}</button><nav id="primary-nav" aria-label="Primary navigation" className={open ? "navigation is-open" : "navigation"}>{links.map(link => <a key={link.href} href={link.href} aria-current={active === link.href.slice(2) ? "location" : undefined} onClick={() => setOpen(false)}>{link.label}<span aria-hidden="true">↗</span></a>)}</nav></Container></header>;
 }
 
 
