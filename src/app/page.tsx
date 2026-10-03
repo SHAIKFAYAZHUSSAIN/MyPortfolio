@@ -3,11 +3,12 @@ import { LabSection } from "@/components/lab/lab-section";
 import { CodeArchive } from "@/components/code-archive";
 import { FilmArchive } from "@/components/film-archive";
 import { CinematicHero } from "@/components/cinematic-hero";
+import { OpeningSplash } from "@/components/opening-splash";
 import { ActionLink, Container, MediaFrame, Section } from "@/components/ui";
 import { films, profile, projects } from "@/data/portfolio";
 
 export default function Home() {
-  return <><main id="main">
+  return <><OpeningSplash /><main id="main">
     <CinematicHero />
 
     <FilmArchive films={films} />

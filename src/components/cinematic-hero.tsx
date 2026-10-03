@@ -51,7 +51,23 @@ export function CinematicHero() {
       if (reel) timeline.add(reel, { opacity: [0,1], y: [12,0], duration: 1000, ease: motion.ease.settle }, 1870);
       if (header) timeline.add(header, { opacity: [0, 1], duration: 650, ease: motion.ease.calm }, 2080);
       timeline.call(finish, motion.duration.opening);
-      timeline.play();
+
+      const isSplashPending = document.documentElement.classList.contains("splash-pending") ||
+        !!document.querySelector(".opening-splash[data-active='true']");
+
+      let started = false;
+      const startHero = () => {
+        if (started || finished) return;
+        started = true;
+        timeline.play();
+      };
+
+      if (isSplashPending) {
+        window.addEventListener("splash:reveal", startHero, { once: true });
+        window.setTimeout(startHero, 4200);
+      } else {
+        startHero();
+      }
     } catch { finish(); }
     // Interaction immediately restores all controls; the introduction never blocks navigation.
     const onKey = (event: KeyboardEvent) => { if (["Tab", "Escape", "PageDown", "End", " "].includes(event.key)) finish(); };
@@ -61,7 +77,7 @@ export function CinematicHero() {
     window.addEventListener("pointerdown", finish, { once: true });
     window.addEventListener("scroll", onScroll, { passive: true });
     preference.addEventListener("change", onPreference);
-    const failSafe = window.setTimeout(finish, motion.duration.opening + 600);
+    const failSafe = window.setTimeout(finish, 4000 + motion.duration.opening + 600);
     return () => {
       finish();
       window.clearTimeout(failSafe);
