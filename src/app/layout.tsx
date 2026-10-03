@@ -6,7 +6,7 @@ import "./art-direction.css";
 import "./motion.css";
 
 export const metadata: Metadata = {
-  title: "Fayaz Shaik — Filmmaker × Developer × Vibecoder",
+  title: "Fayaz Shaik",
   description: "Turning ideas into experiences. Selected films, code projects and creative experiments by Fayaz Shaik.",
 };
 
